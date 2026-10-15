@@ -1,5 +1,21 @@
-import {cookies} from "next/headers";
-import {redirect} from "next/navigation";
-import {createServerClient} from "@supabase/ssr";
+import {moveSession} from "@/lib/move/server";
+import {AvailabilityForm} from "./availability-form";
 export const dynamic="force-dynamic";
-export default async function AppHome(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)redirect("/login");const jar=await cookies();const supabase=createServerClient(url,key,{cookies:{getAll(){return jar.getAll()},setAll(){/* Read-only server component. Cookie refresh is handled by dedicated auth middleware in a later milestone. */}}});const {data:{user}}=await supabase.auth.getUser();if(!user)redirect("/login");return <main className="shell"><header className="top"><div className="logo">move<span>.</span></div><a className="pill" href="/">Visa demo</a></header><article className="card"><p className="muted">INLOGGAD</p><h1>Hej!</h1><p>Du är autentiserad som {user.email}. Personliga uppdrag visas när ditt Move-medlemskap har skapats och åtkomstreglerna har verifierats.</p></article></main>}
+export default async function AppHome(){
+ const {supabase,user}=await moveSession();
+ const {data:members,error}=await supabase.schema("move").from("memberships").select("id,organization_id,full_name,role").eq("user_id",user.id).limit(2);
+ const member=members?.length===1?members[0]:null;
+ const {data:jobs}=member?await supabase.schema("move").from("jobs").select("id,title,scheduled_start,scheduled_end,origin_address,status").eq("organization_id",member.organization_id).order("scheduled_start",{ascending:true}).limit(10):{data:null};
+ const {data:entries}=member?await supabase.schema("move").from("time_entries").select("id,starts_at,ends_at,status").eq("employee_id",member.id).order("starts_at",{ascending:false}).limit(5):{data:null};
+ return <main className="shell" style={{maxWidth:880}}>
+ <header className="top"><div className="logo">move<span>.</span></div><a className="pill" href="/">Visa design-demo</a></header>
+ <p className="muted">PERSONALPORTAL · INLOGGAD</p><h1>Hej{member?", "+member.full_name.split(" ")[0]:""}.</h1><p style={{marginBottom:24}}>Inloggad som {user.email}</p>
+ {error?<article className="card"><h2>Databasanslutning väntar</h2><p>Move-schemat måste först aktiveras för säkert API-bruk. Inga andra projekts uppgifter exponeras.</p></article>:
+ !member?<article className="card"><h2>Väntar på inbjudan</h2><p>Ditt konto är inloggat men ännu inte kopplat till någon Move-organisation. En administratör behöver lägga till dig.</p></article>:
+ <div className="grid">
+ <article className="card wide"><h2>Mina uppdrag</h2>{jobs?.length?jobs.map(j=><div className="line" key={j.id}><div><strong>{j.title}</strong><p className="muted">{new Date(j.scheduled_start).toLocaleString("sv-SE",{dateStyle:"medium",timeStyle:"short",timeZone:"Europe/Stockholm"})} · {j.origin_address||"Adress ej angiven"}</p></div><span className="status">{j.status}</span></div>):<p>Inga tilldelade uppdrag.</p>}</article>
+ <article className="card"><h2>Min tillgänglighet</h2><AvailabilityForm/></article>
+ <article className="card wide"><h2>Mina senaste tidrapporter</h2>{entries?.length?entries.map(e=><div className="line" key={e.id}><span>{new Date(e.starts_at).toLocaleDateString("sv-SE")}</span><span className="status">{e.status}</span></div>):<p>Inga rapporter ännu.</p>}</article>
+ </div>}
+ </main>;
+}
