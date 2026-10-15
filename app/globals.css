@@ -73,3 +73,9 @@
 .schedule-day-heading h2{font-size:18px}
 @media(max-width:700px){.month-calendar{padding:13px;margin-top:18px}.month-heading h2{font-size:18px}.calendar-weekdays,.calendar-month-grid{gap:4px}.calendar-day{min-height:59px;padding:6px 5px;border-width:1px;border-radius:8px}.calendar-number{font-size:14px}.calendar-job-count{font-size:9px}.calendar-key{font-size:11px;gap:9px 12px}}
 @media(max-width:370px){.calendar-day{min-height:52px}.calendar-job-count{font-size:8px}}
+
+
+.job-edit-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 10px}
+.job-edit-toolbar button{display:inline-flex;align-items:center;gap:8px;background:#eaf2ff;color:#2865cb;padding:11px 14px;border-radius:11px;font-weight:700;font-size:12px}
+.job-edit-toolbar button.delete-job{background:#fff0f0;color:#ad3c42}
+.job-edit-toolbar button:focus-visible{outline:3px solid #8cb1ff;outline-offset:2px}
