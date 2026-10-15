@@ -1,6 +1,8 @@
 import {moveSession} from "@/lib/move/server";
 import {AvailabilityForm} from "./availability-form";
 import {TimeEntryForm} from "./time-entry-form";
+import {MaterialForm} from "./material-form";
+import {ReviewForm} from "./review-form";
 export const dynamic="force-dynamic";
 export default async function AppHome(){
  const {supabase,user}=await moveSession();
@@ -10,6 +12,9 @@ export default async function AppHome(){
  const {data:assignments}=member?await supabase.schema("move").from("job_assignments").select("job_id").eq("employee_id",member.id):{data:null};
  const assignedIds=new Set((assignments||[]).map(a=>a.job_id));
  const assignedJobs=(jobs||[]).filter(j=>assignedIds.has(j.id));
+ const {data:materials}=member?await supabase.schema("move").from("materials").select("id,name,unit").eq("organization_id",member.organization_id).eq("active",true):{data:null};
+ const isAdmin=!!member&&["owner","admin","manager"].includes(member.role);
+ const {data:pending}=isAdmin?await supabase.schema("move").from("time_entries").select("id,starts_at,unpaid_break_minutes").eq("organization_id",member!.organization_id).eq("status","submitted").limit(30):{data:null};
  const {data:entries}=member?await supabase.schema("move").from("time_entries").select("id,starts_at,ends_at,status").eq("employee_id",member.id).order("starts_at",{ascending:false}).limit(5):{data:null};
  return <main className="shell" style={{maxWidth:880}}>
  <header className="top"><div className="logo">move<span>.</span></div><a className="pill" href="/">Visa design-demo</a></header>
