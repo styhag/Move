@@ -1,0 +1,5 @@
+import {cookies} from "next/headers";
+import {redirect} from "next/navigation";
+import {createServerClient} from "@supabase/ssr";
+export const dynamic="force-dynamic";
+export default async function AppHome(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)redirect("/login");const jar=await cookies();const supabase=createServerClient(url,key,{cookies:{getAll(){return jar.getAll()},setAll(){/* Read-only server component. Cookie refresh is handled by dedicated auth middleware in a later milestone. */}}});const {data:{user}}=await supabase.auth.getUser();if(!user)redirect("/login");return <main className="shell"><header className="top"><div className="logo">move<span>.</span></div><a className="pill" href="/">Visa demo</a></header><article className="card"><p className="muted">INLOGGAD</p><h1>Hej!</h1><p>Du är autentiserad som {user.email}. Personliga uppdrag visas när ditt Move-medlemskap har skapats och åtkomstreglerna har verifierats.</p></article></main>}
