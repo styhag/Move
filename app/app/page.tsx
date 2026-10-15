@@ -25,6 +25,8 @@ export default async function AppHome(){
  <article className="card wide"><h2>Mina uppdrag</h2>{jobs?.length?jobs.map(j=><div className="line" key={j.id}><div><strong>{j.title}</strong><p className="muted">{new Date(j.scheduled_start).toLocaleString("sv-SE",{dateStyle:"medium",timeStyle:"short",timeZone:"Europe/Stockholm"})} · {j.origin_address||"Adress ej angiven"}</p></div><span className="status">{j.status}</span></div>):<p>Inga tilldelade uppdrag.</p>}</article>
  <article className="card"><h2>Min tillgänglighet</h2><AvailabilityForm/></article>
  <article className="card wide"><h2>Rapportera tid</h2><TimeEntryForm jobs={assignedJobs.map(j=>({id:j.id,title:j.title}))}/></article>
+ <article className="card wide"><h2>Rapportera material</h2><MaterialForm jobs={assignedJobs.map(j=>({id:j.id,title:j.title}))} materials={materials||[]}/></article>
+ {isAdmin&&<article className="card wide"><h2>Attestera tidrapporter</h2>{pending?.length?pending.map(e=><div key={e.id} className="line"><div><strong>{new Date(e.starts_at).toLocaleString("sv-SE")}</strong><p className="muted">Rast: {e.unpaid_break_minutes} min</p></div><ReviewForm entryId={e.id}/></div>):<p>Inga rapporter väntar på attest.</p>}</article>}
  <article className="card wide"><h2>Mina senaste tidrapporter</h2>{entries?.length?entries.map(e=><div className="line" key={e.id}><span>{new Date(e.starts_at).toLocaleDateString("sv-SE")}</span><span className="status">{e.status}</span></div>):<p>Inga rapporter ännu.</p>}</article>
  </div>}
  </main>;
