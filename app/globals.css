@@ -34,3 +34,12 @@
 .job-status-actions button:disabled{opacity:.45;cursor:default}
 .reset-demo{width:100%;padding:14px;margin-top:25px;background:#fff;border:1px solid #dce4ef;border-radius:12px;color:#425575;font-weight:700}
 @media(max-width:640px){.job-filters{gap:6px}.job-filters button{padding:8px 11px;font-size:11px}}
+
+
+.job-dialog{width:min(610px,calc(100vw - 24px));max-height:min(90vh,850px);overflow-y:auto;overscroll-behavior:contain}
+.job-dialog form{display:grid;gap:14px}
+.job-dialog form>label,.job-dialog .dialog-two>label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:700;color:#60718a}
+.job-dialog input,.job-dialog select,.job-dialog textarea{width:100%;min-width:0;padding:12px;border:1px solid #dce4ef;border-radius:10px;background:#fff;color:#172b4b;font-size:14px}
+.job-dialog .dialog-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.job-dialog .dialog-hint{font-size:12px;color:#72839b;line-height:1.5;margin:0 0 18px}
+@media(max-width:500px){.job-dialog .dialog-two{grid-template-columns:1fr}}
