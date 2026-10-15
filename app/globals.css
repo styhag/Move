@@ -22,3 +22,15 @@
 .legend-dot.done{background:#2aaa70}
 .legend-dot.cancelled{background:#dc6872}
 @media(max-width:640px){.job-legend{gap:9px 13px;font-size:11px}.job-card{border-left-width:4px}}
+
+
+.job-filters{display:flex;flex-wrap:wrap;gap:8px;margin:-12px 0 24px}
+.job-filters button{background:#fff;border:1px solid #e0e7f0;border-radius:999px;color:#66778e;padding:9px 13px;font-size:12px;font-weight:700}
+.job-filters button.selected{background:#213b6a;border-color:#213b6a;color:white}
+.job-filters button:focus-visible,.job-status-actions button:focus-visible,.reset-demo:focus-visible{outline:3px solid #83aaff;outline-offset:3px}
+.job-status-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:16px;margin:15px 0 5px;background:white;border:1px solid #e7ebf2;border-radius:15px}
+.job-status-actions strong{width:100%;font-size:12px;color:#718097}
+.job-status-actions button{border:1px solid transparent}
+.job-status-actions button:disabled{opacity:.45;cursor:default}
+.reset-demo{width:100%;padding:14px;margin-top:25px;background:#fff;border:1px solid #dce4ef;border-radius:12px;color:#425575;font-weight:700}
+@media(max-width:640px){.job-filters{gap:6px}.job-filters button{padding:8px 11px;font-size:11px}}
