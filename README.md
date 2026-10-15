@@ -21,3 +21,6 @@ All Move business tables live in the `move` schema, separate from existing `ener
 2. Real persistence, time + material submission and approvals.
 3. Availability and shift offers with transactional acceptance.
 4. Tests, staging deployment and pilot.
+
+## Design v2
+Mobile-first UI lives in `app/page.tsx` and `app/globals.css`. Both are required for a complete render. The demo uses local browser storage only.
