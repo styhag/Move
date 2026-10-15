@@ -42,3 +42,27 @@ export async function submitTimeEntry(_prev:ActionResult,form:FormData):Promise<
  if(error)return {ok:false,message:"Tidrapporten kunde inte sparas. Kontrollera uppgifterna och försök igen."};
  revalidatePath("/app");return {ok:true,message:"Tidrapporten är inskickad för attest."};
 }
+
+
+export async function submitMaterial(_prev:ActionResult,form:FormData):Promise<ActionResult>{
+ const {supabase,user}=await moveSession();
+ const jobId=String(form.get("job_id")||""),materialId=String(form.get("material_id")||"");
+ const quantity=Number(form.get("quantity"));
+ if(!/^[0-9a-f-]{36}$/i.test(jobId)||!/^[0-9a-f-]{36}$/i.test(materialId)||!Number.isFinite(quantity)||quantity<=0||quantity>10000)return {ok:false,message:"Kontrollera uppdrag, material och antal."};
+ const {data:members,error}=await supabase.schema("move").from("memberships").select("id,organization_id").eq("user_id",user.id).limit(2);
+ if(error||members?.length!==1)return {ok:false,message:"Ditt Move-medlemskap kunde inte verifieras."};
+ const member=members[0];
+ const {error:saveError}=await supabase.schema("move").from("job_material_entries").insert({organization_id:member.organization_id,job_id:jobId,material_id:materialId,reported_by:member.id,quantity});
+ if(saveError)return {ok:false,message:"Kunde inte registrera material. Kontrollera att du är tilldelad uppdraget."};
+ revalidatePath("/app");return {ok:true,message:"Materialet har registrerats."};
+}
+export async function reviewTimeEntry(_prev:ActionResult,form:FormData):Promise<ActionResult>{
+ const {supabase,user}=await moveSession();
+ const entryId=String(form.get("entry_id")||""),status=String(form.get("decision")||"");
+ if(!/^[0-9a-f-]{36}$/i.test(entryId)||!["approved","rejected"].includes(status))return {ok:false,message:"Ogiltig attestering."};
+ const {data:members,error}=await supabase.schema("move").from("memberships").select("organization_id,role").eq("user_id",user.id).limit(2);
+ if(error||members?.length!==1||!["owner","admin","manager"].includes(members[0].role))return {ok:false,message:"Du saknar behörighet att attestera."};
+ const {data, error:saveError}=await supabase.schema("move").from("time_entries").update({status}).eq("id",entryId).eq("organization_id",members[0].organization_id).eq("status","submitted").select("id").maybeSingle();
+ if(saveError||!data)return {ok:false,message:"Rapporten kunde inte attesteras eller har redan hanterats."};
+ revalidatePath("/app");return {ok:true,message:status==="approved"?"Rapporten är godkänd.":"Rapporten är avvisad."};
+}
