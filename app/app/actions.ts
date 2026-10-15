@@ -38,7 +38,7 @@ export async function submitTimeEntry(_prev:ActionResult,form:FormData):Promise<
  // Stockholm timezone offsets are determined for each date, including DST transitions.
  const offset=(date:string,time:string)=>{const utc=new Date(date+"T"+time+":00Z");const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Stockholm",timeZoneName:"shortOffset"}).formatToParts(utc);const zone=parts.find(p=>p.type==="timeZoneName")?.value||"GMT+1";const match=zone.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);const n=match?(Number(match[2])*60+Number(match[3]||0))*(match[1]==="+"?1:-1):60;return new Date(utc.getTime()-n*60000).toISOString()};
  const startsAt=offset(day,start),endsAt=offset(day,end);
- const {error}=await supabase.schema("move").from("time_entries").insert({organization_id:member.organization_id,employee_id:member.id,job_id:jobId,work_type:"moving",starts_at:startsAt,ends_at:endsAt,unpaid_break_minutes:breakMinutes,comment,status:"submitted"});
+ const {error}=await supabase.schema("move").from("time_entries").insert({organization_id:member.organization_id,employee_id:member.id,job_id:jobId,work_type:"job",starts_at:startsAt,ends_at:endsAt,unpaid_break_minutes:breakMinutes,comment,status:"submitted"});
  if(error)return {ok:false,message:"Tidrapporten kunde inte sparas. Kontrollera uppgifterna och försök igen."};
  revalidatePath("/app");return {ok:true,message:"Tidrapporten är inskickad för attest."};
 }
